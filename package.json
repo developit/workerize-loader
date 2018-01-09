@@ -1,0 +1,59 @@
+{
+  "name": "workerize-loader",
+  "version": "1.0.0",
+  "description": "Automatically move a module into a Web Worker (Webpack loader)",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "microbundle --inline none --format cjs --no-compress src/*.js",
+    "prepublishOnly": "npm run build",
+    "dev": "webpack-dev-server --no-hot --config test/webpack.config.js",
+    "test": "npm run build && webpack --config test/webpack.config.js && npm run -s mocha",
+    "mocha": "concurrently -r --kill-others \"serve -p 42421 test/dist\" \"mocha-chrome http://localhost:42421\""
+  },
+  "eslintConfig": {
+    "extends": "eslint-config-developit",
+    "rules": {
+      "jest/valid-expect": 0,
+      "no-console": 0
+    }
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "keywords": [
+    "webpack",
+    "loader",
+    "worker",
+    "web worker",
+    "thread",
+    "workerize"
+  ],
+  "author": "Jason Miller <jason@developit.ca> (http://jasonformat.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "concurrently": "^3.5.1",
+    "css-loader": "^0.28.8",
+    "eslint": "^4.14.0",
+    "eslint-config-developit": "^1.1.1",
+    "exports-loader": "^0.6.4",
+    "fast-async": "^6.3.0",
+    "html-webpack-plugin": "^2.30.1",
+    "microbundle": "^0.2.4",
+    "mocha": "^4.1.0",
+    "mocha-chrome": "^1.0.3",
+    "mocha-puppeteer": "^0.13.0",
+    "serve": "^6.4.4",
+    "style-loader": "^0.19.1",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.10.1"
+  },
+  "dependencies": {
+    "loader-utils": "^1.1.0"
+  }
+}

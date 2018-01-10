@@ -1,10 +1,6 @@
-<p align="center">
-  <img src="https://i.imgur.com/AvLdyMd.jpg" width="2716" alt="workerize-loader">
-  <br>
-  <a href="https://www.npmjs.org/package/workerize-loader"><img src="https://img.shields.io/npm/v/workerize-loader.svg?style=flat" alt="npm"></a> <a href="https://travis-ci.org/developit/workerize-loader"><img src="https://travis-ci.org/developit/workerize-loader.svg?branch=master" alt="travis"></a>
-</p>
+<img src="https://i.imgur.com/HZZG8wr.jpg" width="2716" alt="workerize-loader">
 
-# workerize-loader
+# workerize-loader [![npm](https://img.shields.io/npm/v/workerize-loader.svg?style=flat)](https://www.npmjs.org/package/workerize-loader) [![travis](https://travis-ci.org/developit/workerize-loader.svg?branch=master)](https://travis-ci.org/developit/workerize-loader)
 
 > A webpack loader that moves a module and its dependencies into a Web Worker, automatically reflecting exported functions as asynchronous proxies.
 

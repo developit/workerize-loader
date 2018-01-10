@@ -1,4 +1,4 @@
-<img src="https://i.imgur.com/HZZG8wr.jpg" width="2716" alt="workerize-loader">
+<img src="https://i.imgur.com/HZZG8wr.jpg" width="1358" alt="workerize-loader">
 
 # workerize-loader [![npm](https://img.shields.io/npm/v/workerize-loader.svg?style=flat)](https://www.npmjs.org/package/workerize-loader) [![travis](https://travis-ci.org/developit/workerize-loader.svg?branch=master)](https://travis-ci.org/developit/workerize-loader)
 

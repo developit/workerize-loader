@@ -1,12 +1,14 @@
 {
   "name": "workerize-loader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Automatically move a module into a Web Worker (Webpack loader)",
   "main": "dist/index.js",
+  "repository": "developit/workerize-loader",
   "scripts": {
     "build": "microbundle --inline none --format cjs --no-compress src/*.js",
     "prepublishOnly": "npm run build",
     "dev": "webpack-dev-server --no-hot --config test/webpack.config.js",
+    "release": "npm t && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish",
     "test": "npm run build && webpack --config test/webpack.config.js && npm run -s mocha",
     "mocha": "concurrently -r --kill-others \"serve -p 42421 test/dist\" \"mocha-chrome http://localhost:42421\""
   },
@@ -39,7 +41,7 @@
     "chai-as-promised": "^7.1.1",
     "concurrently": "^3.5.1",
     "css-loader": "^0.28.8",
-    "eslint": "^4.14.0",
+    "eslint": "^4.15.0",
     "eslint-config-developit": "^1.1.1",
     "exports-loader": "^0.6.4",
     "fast-async": "^6.3.0",

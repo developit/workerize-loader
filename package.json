@@ -10,7 +10,7 @@
     "dev": "webpack-dev-server --no-hot --config test/webpack.config.js",
     "release": "npm t && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish",
     "test": "npm run build && webpack --config test/webpack.config.js && npm run -s mocha",
-    "mocha": "concurrently -r --kill-others \"serve -p 42421 test/dist\" \"mocha-chrome http://localhost:42421\""
+    "mocha": "concurrently -r --kill-others \"serve -p 42421 test/dist\" \"sleep 1 && mocha-chrome http://localhost:42421\""
   },
   "eslintConfig": {
     "extends": "eslint-config-developit",

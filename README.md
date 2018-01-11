@@ -2,6 +2,8 @@
 
 # workerize-loader [![npm](https://img.shields.io/npm/v/workerize-loader.svg?style=flat)](https://www.npmjs.org/package/workerize-loader) [![travis](https://travis-ci.org/developit/workerize-loader.svg?branch=master)](https://travis-ci.org/developit/workerize-loader)
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/developit/workerize-loader.svg)](https://greenkeeper.io/)
+
 > A webpack loader that moves a module and its dependencies into a Web Worker, automatically reflecting exported functions as asynchronous proxies.
 
 - Bundles a tiny, purpose-built RPC implementation into your app

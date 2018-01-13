@@ -14,7 +14,7 @@
 ## Install
 
 ```sh
-npm install --save-dev workerize-loader
+npm install -D workerize-loader
 ```
 
 
@@ -43,6 +43,12 @@ instance.expensive(1000).then( count => {
 	console.log(`Ran ${count} loops`)
 })
 ```
+
+
+### Credit
+
+The inner workings here are heavily inspired by [worker-loader](https://github.com/webpack-contrib/worker-loader). It's worth a read!
+
 
 ### License
 

@@ -1,6 +1,11 @@
-dist: trusty
 language: node_js
-addons:
-  chrome: stable
 node_js:
   - stable
+dist: trusty
+sudo: false
+addons:
+  chrome: stable
+cache:
+  npm: true
+  directories:
+    - node_modules

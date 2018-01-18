@@ -47,7 +47,7 @@
     "fast-async": "^6.3.0",
     "html-webpack-plugin": "^2.30.1",
     "microbundle": "^0.3.0",
-    "mocha": "^4.1.0",
+    "mocha": "^5.0.0",
     "mocha-chrome": "^1.0.3",
     "mocha-puppeteer": "^0.13.0",
     "serve": "^6.4.4",

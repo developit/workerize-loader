@@ -52,4 +52,4 @@ The inner workings here are heavily inspired by [worker-loader](https://github.c
 
 ### License
 
-[MIT License](LICENSE.md) © [Jason Miller](https://jasonformat.com)
+[MIT License](https://oss.ninja/mit/developit) © [Jason Miller](https://jasonformat.com)

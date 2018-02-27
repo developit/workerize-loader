@@ -17,7 +17,7 @@ loader.pitch = function(request) {
 	const cb = this.async();
 
 	const filename = loaderUtils.interpolateName(this, `${options.name || '[hash]'}.worker.js`, {
-		context: options.context || this.options.context,
+		context: options.context || this.rootContext || this.options.context,
 		regExp: options.regExp
 	});
 

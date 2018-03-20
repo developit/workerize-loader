@@ -14,7 +14,7 @@ export default function addMethods(worker, methods) {
 		}
 		else {
 			let evt = document.createEvent('Event');
-			evt.initEvent(d.method);
+			evt.initEvent(d.method, false, false);
 			evt.data = d.params;
 			worker.dispatchEvent(evt);
 		}

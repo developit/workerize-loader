@@ -19,6 +19,14 @@ describe('worker', () => {
 		expect(out).toEqual('a [bar:3] b');
 	});
 
+	it('worker.throwError() should pass the Error back to the application context', async () => {
+		try {
+			let out = await worker.throwError();
+		} catch (e) {
+			expect(e).toEqual(new Error('Error in worker.js'));
+		}
+	});
+
 	it('should fire ready event', done => {
 		let worker = new Worker(),
 			called = false,

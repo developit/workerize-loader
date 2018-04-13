@@ -8,7 +8,12 @@ export default function addMethods(worker, methods) {
 			let f = callbacks[d.id];
 			if (f) {
 				delete callbacks[d.id];
-				if (d.error) f[1](d.error);
+				if (d.error) {
+					let workerError = Error(d.error && d.error.message ? d.error.message : 'Error in worker');
+					if (d.error && d.error.stack) workerError.stack = d.error.stack;
+					if (d.error && d.error.name) workerError.name = d.error.name;
+					f[1](workerError);
+				}
 				else f[0](d.result);
 			}
 		}

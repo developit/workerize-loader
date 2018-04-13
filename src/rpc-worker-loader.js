@@ -10,11 +10,14 @@ function workerSetup() {
 			else {
 				p = Promise.reject('No such method');
 			}
-			p.then(
-				result => {
+			p.then(result => {
 					postMessage({ type: 'RPC', id, result });
-				},
-				error => {
+				})
+				.catch(error => {
+					if (error.stack) {
+						postMessage({ type: 'RPC', id, error: { name: error.name, message: error.message, stack: error.stack } });
+						return;
+					}
 					postMessage({ type: 'RPC', id, error });
 				});
 		}

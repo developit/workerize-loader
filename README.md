@@ -25,10 +25,10 @@ npm install -D workerize-loader
 ```js
 // block for `time` ms, then return the number of loops we could run in that time:
 export function expensive(time) {
-	let start = Date.now(),
-		count = 0
-	while (Date.now() - start < time) count++
-	return count
+    let start = Date.now(),
+        count = 0
+    while (Date.now() - start < time) count++
+    return count
 }
 ```
 
@@ -40,10 +40,29 @@ import worker from 'workerize-loader!./worker'
 let instance = worker()  // `new` is optional
 
 instance.expensive(1000).then( count => {
-	console.log(`Ran ${count} loops`)
+    console.log(`Ran ${count} loops`)
 })
 ```
 
+### About [Babel](https://babeljs.io/)
+
+If you're using [Babel](https://babeljs.io/) in your build, make sure you disabled commonJS transform. Otherwize, workerize-loader won't be able to retrieve the list of exported function from your worker script :
+```js
+{
+    test: /\.js$/,
+    loader: "babel-loader",
+    options: {
+        presets: [
+            [
+                "env",
+                {
+                    modules: false,
+                },
+            ],
+        ]
+    }
+}
+```
 
 ### Credit
 

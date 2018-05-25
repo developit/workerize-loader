@@ -1,6 +1,6 @@
 {
   "name": "workerize-loader",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Automatically move a module into a Web Worker (Webpack loader)",
   "main": "dist/index.js",
   "repository": "developit/workerize-loader",

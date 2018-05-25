@@ -9,12 +9,11 @@ export default function addMethods(worker, methods) {
 			if (f) {
 				delete callbacks[d.id];
 				if (d.error) {
-					let workerError = Error(d.error && d.error.message ? d.error.message : 'Error in worker');
-					if (d.error && d.error.stack) workerError.stack = d.error.stack;
-					if (d.error && d.error.name) workerError.name = d.error.name;
-					f[1](workerError);
+					f[1](Object.assign(Error(d.error.message), d.error));
 				}
-				else f[0](d.result);
+				else {
+					f[0](d.result);
+				}
 			}
 		}
 		else {

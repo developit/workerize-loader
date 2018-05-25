@@ -21,9 +21,10 @@ describe('worker', () => {
 
 	it('worker.throwError() should pass the Error back to the application context', async () => {
 		try {
-			let out = await worker.throwError();
-		} catch (e) {
-			expect(e).toEqual(new Error('Error in worker.js'));
+			await worker.throwError();
+		}
+		catch (e) {
+			expect(e).toEqual(Error('Error in worker.js'));
 		}
 	});
 

@@ -13,10 +13,12 @@ function workerSetup() {
 			p.then(result => {
 					postMessage({ type: 'RPC', id, result });
 				})
-				.catch(error => {
-					if (error.stack) {
-						postMessage({ type: 'RPC', id, error: { name: error.name, message: error.message, stack: error.stack } });
-						return;
+				.catch(e => {
+					let error = { message: e};
+					if (e.stack) {
+						error.message = e.message;
+						error.stack = e.stack;
+						error.name = e.name;
 					}
 					postMessage({ type: 'RPC', id, error });
 				});

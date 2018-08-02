@@ -12,14 +12,14 @@ const tapName = 'workerize-loader';
 
 function compilationHook(compiler, handler) {
 	if (compiler.hooks) {
-	  return compiler.hooks.compilation.tap(tapName, handler);
+		return compiler.hooks.compilation.tap(tapName, handler);
 	}
 	return compiler.plugin('compilation', handler);
 }
 
 function parseHook(data, handler) {
 	if (data.normalModuleFactory.hooks) {
-	  return data.normalModuleFactory.hooks.parser.for('javascript/auto').tap(tapName, handler);
+		return data.normalModuleFactory.hooks.parser.for('javascript/auto').tap(tapName, handler);
 	}
 	return data.normalModuleFactory.plugin('parser', handler);
 }

@@ -62,7 +62,7 @@ You can also inline the worker as a BLOB with the `inline` parameter
 ```
 or 
 ```js
-import worker from 'workerize-loader?inline=true!./worker'
+import worker from 'workerize-loader?inline!./worker'
 ```
 
 ### About [Babel](https://babeljs.io/)

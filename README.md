@@ -44,6 +44,27 @@ instance.expensive(1000).then( count => {
 })
 ```
 
+### Options
+
+#### `inline`
+
+Type: `Boolean`
+Default: `false`
+
+You can also inline the worker as a BLOB with the `inline` parameter
+
+```js
+// webpack.config.js
+{
+  loader: 'workerize-loader',
+  options: { inline: true }
+}
+```
+or 
+```js
+import worker from 'workerize-loader?inline!./worker'
+```
+
 ### About [Babel](https://babeljs.io/)
 
 If you're using [Babel](https://babeljs.io/) in your build, make sure you disabled commonJS transform. Otherwize, workerize-loader won't be able to retrieve the list of exported function from your worker script :

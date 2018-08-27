@@ -51,8 +51,13 @@ loader.pitch = function(request) {
 		namedChunkFilename: null
 	};
 
+	const compilerOptions = this._compiler.options || {};
+	if (compilerOptions.output && compilerOptions.output.globalObject==='window') {
+		console.warn('Warning (workerize-loader): output.globalObject is set to "window". It should be set to "self" or "this" to support HMR in Workers.');
+	}
+
 	worker.compiler = this._compilation.createChildCompiler('worker', worker.options);
-	
+
 	(new WebWorkerTemplatePlugin(worker.options)).apply(worker.compiler);
 
 	if (this.target!=='webworker' && this.target!=='web') {

@@ -8,6 +8,28 @@ import WebWorkerTemplatePlugin from 'webpack/lib/webworker/WebWorkerTemplatePlug
 export default function loader() {}
 
 const CACHE = {};
+const tapName = 'workerize-loader';
+
+function compilationHook(compiler, handler) {
+	if (compiler.hooks) {
+		return compiler.hooks.compilation.tap(tapName, handler);
+	}
+	return compiler.plugin('compilation', handler);
+}
+
+function parseHook(data, handler) {
+	if (data.normalModuleFactory.hooks) {
+		return data.normalModuleFactory.hooks.parser.for('javascript/auto').tap(tapName, handler);
+	}
+	return data.normalModuleFactory.plugin('parser', handler);
+}
+
+function exportDeclarationHook(parser, handler) {
+	if (parser.hooks) {
+		return parser.hooks.exportDeclaration.tap(tapName, handler);
+	}
+	return parser.plugin('export declaration', handler);
+}
 
 loader.pitch = function(request) {
 	this.cacheable(false);
@@ -30,26 +52,25 @@ loader.pitch = function(request) {
 	};
 
 	worker.compiler = this._compilation.createChildCompiler('worker', worker.options);
-
-	worker.compiler.apply(new WebWorkerTemplatePlugin(worker.options));
+	
+	(new WebWorkerTemplatePlugin(worker.options)).apply(worker.compiler);
 
 	if (this.target!=='webworker' && this.target!=='web') {
-		worker.compiler.apply(new NodeTargetPlugin());
+		(new NodeTargetPlugin()).apply(worker.compiler);
 	}
 
-	worker.compiler.apply(new SingleEntryPlugin(this.context, `!!${path.resolve(__dirname, 'rpc-worker-loader.js')}!${request}`, 'main'));
+	(new SingleEntryPlugin(this.context, `!!${path.resolve(__dirname, 'rpc-worker-loader.js')}!${request}`, 'main')).apply(worker.compiler);
 
 	const subCache = `subcache ${__dirname} ${request}`;
 
-	worker.compiler.plugin('compilation', (compilation, data) => {
+	compilationHook(worker.compiler, (compilation, data) => {
 		if (compilation.cache) {
 			if (!compilation.cache[subCache]) compilation.cache[subCache] = {};
 
 			compilation.cache = compilation.cache[subCache];
 		}
-
-		data.normalModuleFactory.plugin('parser', (parser, options) => {
-			parser.plugin('export declaration', expr => {
+		parseHook(data, (parser, options) => {
+			exportDeclarationHook(parser, expr => {
 				let decl = expr.declaration || expr,
 					{ compilation, current } = parser.state,
 					entry = compilation.entries[0].resource;

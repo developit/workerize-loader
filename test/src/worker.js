@@ -10,6 +10,4 @@ export function throwError() {
 	throw new Error('Error in worker.js');
 }
 
-export function bar(a, b) {
-	return `${a} [bar:${otherBar}] ${b}`;
-}
+export const bar = (a, b) => `${a} [bar:${otherBar}] ${b}`;

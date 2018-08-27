@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "repository": "developit/workerize-loader",
   "scripts": {
-    "build": "microbundle --inline none --format cjs --no-compress src/*.js",
+    "build": "microbundle --target node --format cjs --no-compress src/*.js",
     "prepublishOnly": "npm run build",
     "dev": "karmatic watch --no-headless",
     "test": "npm run build && karmatic",
@@ -35,10 +35,14 @@
   "devDependencies": {
     "eslint": "^5.0.0",
     "eslint-config-developit": "^1.1.1",
-    "karmatic": "^1.0.5",
-    "microbundle": "^0.4.2"
+    "karmatic": "^1.2.0",
+    "microbundle": "^0.6.0",
+    "webpack": "^3.12.0"
   },
   "dependencies": {
     "loader-utils": "^1.1.0"
+  },
+  "peerDependencies": {
+    "webpack": "*"
   }
 }

@@ -115,7 +115,7 @@ loader.pitch = function(request) {
 				worker.url = `URL.createObjectURL(new Blob([${JSON.stringify(contents)}]))`;
 			}
 			else if (options.publicPath) {
-				worker.url = `${JSON.stringify(options.publicPath)} + ${JSON.stringify(worker.file)}`;
+				worker.url = `${JSON.stringify(options.publicPath + worker.file)}`;
 			}
 			else {
 				worker.url = `__webpack_public_path__ + ${JSON.stringify(worker.file)}`;

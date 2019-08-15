@@ -122,11 +122,16 @@ loader.pitch = function(request) {
 				delete this._compilation.assets[worker.file];
 			}
 
+			let workerUrl = worker.url;
+			if (options.import) {
+				workerUrl = `"data:,importScripts('"+location.origin+${workerUrl}+"')"`;
+			}
+
 			return cb(null, `
 				var addMethods = require(${loaderUtils.stringifyRequest(this, path.resolve(__dirname, 'rpc-wrapper.js'))})
 				var methods = ${JSON.stringify(exports)}
 				module.exports = function() {
-					var w = new Worker(${worker.url}, { name: ${JSON.stringify(filename)} })
+					var w = new Worker(${workerUrl}, { name: ${JSON.stringify(filename)} })
 					addMethods(w, methods)
 					${ options.ready ? 'w.ready = new Promise(function(r) { w.addEventListener("ready", function(){ r(w) }) })' : '' }
 					return w

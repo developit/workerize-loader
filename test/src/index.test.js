@@ -1,6 +1,7 @@
 import './other';
 import Worker from 'workerize-loader?ready&name=test!./worker';
 import InlineWorker from 'workerize-loader?ready&inline&name=test!./worker';
+import ImportWorker from 'workerize-loader?import!./worker';
 
 describe('worker', () => {
 	let worker;
@@ -93,5 +94,23 @@ describe('async/await demo', () => {
 		console.log(`await worker.bar(1, 2) [${elapsed}ms]: `, two);
 		expect(two).toEqual('1 [bar:3] 2');
 		expect(elapsed).toBeLessThan(20);
+	});
+});
+
+describe('?import option', () => {
+	let worker;
+
+	it('should be an instance of Worker', () => {
+		worker = new ImportWorker();
+		expect(worker).toEqual(jasmine.any(window.Worker));
+	});
+
+	it('worker.foo()', async () => {
+		expect(await worker.foo()).toBe(1);
+	});
+
+	it('worker.bar()', async () => {
+		let out = await worker.bar('a', 'b');
+		expect(out).toEqual('a [bar:3] b');
 	});
 });

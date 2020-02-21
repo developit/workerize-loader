@@ -85,6 +85,40 @@ If you're using [Babel](https://babeljs.io/) in your build, make sure you disabl
 }
 ```
 
+### Testing
+
+To test a module that is normally imported via `workerize-loader` when not using Webpack, import the module directly in your test:
+
+```diff
+-const worker = require('workerize-loader!./worker.js');
++const worker = () => require('./worker.js');
+
+const instance = worker();
+```
+
+To test modules that rely on workerized imports when not using Webpack, you'll need to dig into your test runner a bit. For Jest, it's possible to define a custom `transform` that emulates workerize-loader on the main thread:
+
+```js
+// in your Jest configuration
+{
+  "transform": {
+    "workerize-loader(\\?.*)?!(.*)": "<rootDir>/workerize-jest.js"
+  }
+}
+```
+
+... then add the `workerize-jest.js` shim to your project:
+
+```js
+module.exports = {
+  process(src, filename, config, options) {
+    return 'module.exports = () => require(' + JSON.stringify(filename.replace(/.+!/,'')) + ')';
+  },
+};
+```
+
+Now your tests and any modules they import can use `workerize-loader!` prefixes.
+
 ### Credit
 
 The inner workings here are heavily inspired by [worker-loader](https://github.com/webpack-contrib/worker-loader). It's worth a read!

@@ -102,7 +102,8 @@ loader.pitch = function(request) {
 				// only process entry exports
 				if (current.resource!==entry) return;
 
-				let exports = CACHE[entry] || (CACHE[entry] = {});
+				let key = current.nameForCondition();
+				let exports = CACHE[key] || (CACHE[key] = {});
 
 				if (decl.id) {
 					exports[decl.id.name] = true;
@@ -125,9 +126,9 @@ loader.pitch = function(request) {
 		if (entries[0]) {
 			worker.file = entries[0].files[0];
 
-			let entry = entries[0].entryModule.resource;
+			let key = entries[0].entryModule.nameForCondition();
 			let contents = compilation.assets[worker.file].source();
-			let exports = Object.keys(CACHE[entry] || {});
+			let exports = Object.keys(CACHE[key] || {});
 
 			// console.log('Workerized exports: ', exports.join(', '));
 

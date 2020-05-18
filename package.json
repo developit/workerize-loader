@@ -8,7 +8,7 @@
     "build": "microbundle --target node --format cjs --no-compress src/*.js",
     "prepublishOnly": "npm run build",
     "dev": "karmatic watch --no-headless",
-    "test": "npm run build && karmatic",
+    "test": "npm run build && karmatic && NODE_ENV=production karmatic -p",
     "release": "npm t && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
   "eslintConfig": {

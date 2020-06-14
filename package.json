@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "repository": "developit/workerize-loader",
   "scripts": {
-    "build": "microbundle --target node --format cjs --no-compress src/*.js",
+    "build": "npm run build-loader && npm run build-rpc",
+    "build-loader": "microbundle --target node --format cjs --no-compress src/index.js ",
+    "build-rpc": "microbundle --target web --format cjs --no-compress src/rpc-*.js",
     "prepublishOnly": "npm run build",
     "dev": "karmatic watch --no-headless",
     "test": "npm run build && karmatic && NODE_ENV=production karmatic -p",

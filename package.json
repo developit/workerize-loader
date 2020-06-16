@@ -1,11 +1,13 @@
 {
   "name": "workerize-loader",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Automatically move a module into a Web Worker (Webpack loader)",
   "main": "dist/index.js",
   "repository": "developit/workerize-loader",
   "scripts": {
-    "build": "microbundle --format cjs --no-compress --inline none src/*.js",
+    "build": "npm run -s build-loader && npm run -s build-rpc",
+    "build-loader": "microbundle --target node --format cjs --no-compress src/index.js ",
+    "build-rpc": "microbundle --format cjs --no-compress src/rpc-*.js",
     "prepublishOnly": "npm run build",
     "dev": "karmatic watch --no-headless",
     "test": "npm run build && karmatic && NODE_ENV=production karmatic -p",

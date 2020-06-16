@@ -11,3 +11,21 @@ export function throwError() {
 }
 
 export const bar = (a, b) => `${a} [bar:${otherBar}] ${b}`;
+
+export function getArrayBuffer(len) {
+	return new ArrayBuffer(len);
+}
+
+let insecureBuffer;
+
+export function createInsecureArrayBuffer(len) {
+	insecureBuffer = new ArrayBuffer(len);
+}
+
+export function getInsecureArrayBuffer() {
+	return insecureBuffer;
+}
+
+export function setInsecureArrayBuffer(buffer) {
+	insecureBuffer = buffer;
+}

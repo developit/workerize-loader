@@ -45,6 +45,40 @@ describe('worker', () => {
 		});
 		setTimeout(fin, 300);
 	});
+
+	it('should pass the transferable arguments with transferring the ownership (main => worker thread)', async () => {
+		const len = 1024;
+		let buffer = new ArrayBuffer(len);
+		await worker.setInsecureArrayBuffer(buffer);
+
+		let error;
+		try {
+			await worker.setInsecureArrayBuffer();
+		}
+		catch (e) {
+			error = e;
+		}
+		expect(error).toBe.error;
+	});
+
+	it('should return the transferable result with transferring the ownership (worker thread => main)', async () => {
+		const len = 1024;
+		let buffer = await worker.getArrayBuffer(len);
+		expect(buffer.byteLength).toEqual(len);
+		buffer = await worker.getArrayBuffer(len);
+		expect(buffer.byteLength).toEqual(len);
+
+		await worker.createInsecureArrayBuffer(len);
+		buffer = await worker.getInsecureArrayBuffer();
+		let error;
+		try {
+			await worker.getInsecureArrayBuffer();
+		}
+		catch (e) {
+			error = e;
+		}
+		expect(error).toBe.error;
+	});
 });
 
 describe('async/await demo', () => {

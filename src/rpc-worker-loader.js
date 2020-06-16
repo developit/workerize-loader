@@ -11,7 +11,11 @@ function workerSetup() {
 				p = Promise.reject('No such method');
 			}
 			p.then(result => {
-				postMessage({ type: 'RPC', id, result });
+				const transferables = [result].filter(x => (
+					(x instanceof ArrayBuffer) ||
+					(x instanceof MessagePort) ||
+					(self.ImageBitmap && x instanceof ImageBitmap)));
+				postMessage({ type: 'RPC', id, result }, transferables);
 			})
 				.catch(e => {
 					let error = { message: e };

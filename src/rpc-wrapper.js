@@ -27,7 +27,12 @@ export default function addMethods(worker, methods) {
 		worker[method] = (...params) => new Promise( (a, b) => {
 			let id = ++c;
 			callbacks[id] = [a, b];
-			worker.postMessage({ type: 'RPC', id, method, params });
+			const transferables = params.filter(x => (
+				(x instanceof ArrayBuffer) ||
+				(x instanceof MessagePort) ||
+				(self.ImageBitmap && x instanceof ImageBitmap)
+			));
+			worker.postMessage({ type: 'RPC', id, method, params }, transferables);
 		});
 	});
 }

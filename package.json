@@ -1,16 +1,20 @@
 {
   "name": "workerize-loader",
-  "version": "1.0.4",
+  "version": "1.2.1",
   "description": "Automatically move a module into a Web Worker (Webpack loader)",
   "main": "dist/index.js",
   "repository": "developit/workerize-loader",
   "scripts": {
-    "build": "microbundle --target node --format cjs --no-compress src/*.js",
+    "build": "microbundle --format cjs --no-compress --inline none src/*.js",
     "prepublishOnly": "npm run build",
     "dev": "karmatic watch --no-headless",
-    "test": "npm run build && karmatic",
+    "test": "npm run build && karmatic && NODE_ENV=production karmatic -p",
     "release": "npm t && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
+  "browserslist": [
+    "IE 10",
+    "node 8"
+  ],
   "eslintConfig": {
     "extends": "eslint-config-developit",
     "rules": {
@@ -33,14 +37,14 @@
   "author": "Jason Miller <jason@developit.ca> (http://jasonformat.com)",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^5.0.0",
-    "eslint-config-developit": "^1.1.1",
-    "karmatic": "^1.2.0",
-    "microbundle": "^0.6.0",
-    "webpack": "^4.17.1"
+    "eslint": "^7.2.0",
+    "eslint-config-developit": "^1.2.0",
+    "karmatic": "^1.4.0",
+    "microbundle": "^0.12.1",
+    "webpack": "^4.43.0"
   },
   "dependencies": {
-    "loader-utils": "^1.1.0"
+    "loader-utils": "^2.0.0"
   },
   "peerDependencies": {
     "webpack": "*"

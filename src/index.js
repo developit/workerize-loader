@@ -64,6 +64,25 @@ loader.pitch = function(request) {
 		(new NodeTargetPlugin()).apply(worker.compiler);
 	}
 
+	// webpack >= v4 supports webassembly
+	let wasmPluginPath = null;
+	try {
+		wasmPluginPath = require.resolve(
+			'webpack/lib/web/FetchCompileWasmTemplatePlugin'
+		);
+	}
+	catch (_err) {
+		// webpack <= v3, skipping
+	}
+
+	if (wasmPluginPath) {
+		// eslint-disable-next-line global-require
+		const FetchCompileWasmTemplatePlugin = require(wasmPluginPath);
+		new FetchCompileWasmTemplatePlugin({
+			mangleImports: this._compiler.options.optimization.mangleWasmImports
+		}).apply(worker.compiler);
+	}
+
 	(new SingleEntryPlugin(this.context, `!!${path.resolve(__dirname, 'rpc-worker-loader.js')}!${request}`, 'main')).apply(worker.compiler);
 
 	const subCache = `subcache ${__dirname} ${request}`;
@@ -83,7 +102,8 @@ loader.pitch = function(request) {
 				// only process entry exports
 				if (current.resource!==entry) return;
 
-				let exports = compilation.__workerizeExports || (compilation.__workerizeExports = {});
+				let key = current.nameForCondition();
+				let exports = CACHE[key] || (CACHE[key] = {});
 
 				if (decl.id) {
 					exports[decl.id.name] = true;
@@ -106,8 +126,9 @@ loader.pitch = function(request) {
 		if (entries[0]) {
 			worker.file = entries[0].files[0];
 
+			let key = entries[0].entryModule.nameForCondition();
 			let contents = compilation.assets[worker.file].source();
-			let exports = Object.keys(CACHE[worker.file] = compilation.__workerizeExports || CACHE[worker.file] || {});
+			let exports = Object.keys(CACHE[key] || {});
 
 			// console.log('Workerized exports: ', exports.join(', '));
 
@@ -125,11 +146,16 @@ loader.pitch = function(request) {
 				delete this._compilation.assets[worker.file];
 			}
 
+			let workerUrl = worker.url;
+			if (options.import) {
+				workerUrl = `"data:,importScripts('"+location.origin+${workerUrl}+"')"`;
+			}
+
 			return cb(null, `
 				var addMethods = require(${loaderUtils.stringifyRequest(this, path.resolve(__dirname, 'rpc-wrapper.js'))})
 				var methods = ${JSON.stringify(exports)}
 				module.exports = function() {
-					var w = new Worker(${worker.url}, { name: ${JSON.stringify(filename)} })
+					var w = new Worker(${workerUrl}, { name: ${JSON.stringify(filename)} })
 					addMethods(w, methods)
 					${ options.ready ? 'w.ready = new Promise(function(r) { w.addEventListener("ready", function(){ r(w) }) })' : '' }
 					return w

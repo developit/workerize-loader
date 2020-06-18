@@ -85,6 +85,24 @@ If you're using [Babel](https://babeljs.io/) in your build, make sure you disabl
 }
 ```
 
+### Polyfill Required for IE11
+
+Workerize-loader supports browsers that support Web Workers - that's IE10+.
+However, these browsers require a polyfill in order to use Promises, which Workerize-loader relies on.
+It is recommended that the polyfill be installed globally, since Webpack itself also needs Promises to load bundles.
+
+The smallest implementation is the one we recommend installing:
+
+`npm i promise-polyfill`
+
+Then, in the module you are "workerizing", just add it as your first import:
+
+```js
+import 'promise-polyfill/src/polyfill';
+```
+
+All worker code can now use Promises. 
+
 ### Testing
 
 To test a module that is normally imported via `workerize-loader` when not using Webpack, import the module directly in your test:

@@ -7,30 +7,6 @@ import WebWorkerTemplatePlugin from 'webpack/lib/webworker/WebWorkerTemplatePlug
 
 export default function loader() {}
 
-const CACHE = {};
-const tapName = 'workerize-loader';
-
-function compilationHook(compiler, handler) {
-	if (compiler.hooks) {
-		return compiler.hooks.compilation.tap(tapName, handler);
-	}
-	return compiler.plugin('compilation', handler);
-}
-
-function parseHook(data, handler) {
-	if (data.normalModuleFactory.hooks) {
-		return data.normalModuleFactory.hooks.parser.for('javascript/auto').tap(tapName, handler);
-	}
-	return data.normalModuleFactory.plugin('parser', handler);
-}
-
-function exportDeclarationHook(parser, handler) {
-	if (parser.hooks) {
-		return parser.hooks.exportDeclaration.tap(tapName, handler);
-	}
-	return parser.plugin('export declaration', handler);
-}
-
 loader.pitch = function(request) {
 	this.cacheable(false);
 
@@ -84,56 +60,20 @@ loader.pitch = function(request) {
 	}
 
 	(new SingleEntryPlugin(this.context, `!!${path.resolve(__dirname, 'rpc-worker-loader.js')}!${request}`, 'main')).apply(worker.compiler);
-
-	const subCache = `subcache ${__dirname} ${request}`;
-
-	compilationHook(worker.compiler, (compilation, data) => {
-		if (compilation.cache) {
-			if (!compilation.cache[subCache]) compilation.cache[subCache] = {};
-
-			compilation.cache = compilation.cache[subCache];
-		}
-		parseHook(data, (parser, options) => {
-			exportDeclarationHook(parser, expr => {
-				let decl = expr.declaration || expr,
-					{ compilation, current } = parser.state,
-					entry = compilation.entries[0].resource;
-
-				// only process entry exports
-				if (current.resource!==entry) return;
-
-				let key = current.nameForCondition();
-				let exports = CACHE[key] || (CACHE[key] = {});
-
-				if (decl.id) {
-					exports[decl.id.name] = true;
-				}
-				else if (decl.declarations) {
-					for (let i=0; i<decl.declarations.length; i++) {
-						exports[decl.declarations[i].id.name] = true;
-					}
-				}
-				else {
-					console.warn('[workerize] unknown export declaration: ', expr);
-				}
-			});
-		});
-	});
-
 	worker.compiler.runAsChild((err, entries, compilation) => {
 		if (err) return cb(err);
 
 		if (entries[0]) {
 			worker.file = entries[0].files[0];
 
-			let key = entries[0].entryModule.nameForCondition();
 			let contents = compilation.assets[worker.file].source();
-			let exports = Array.from(
-				new Set([
-					...Object.keys(CACHE[key] || {}),
-					...entries[0].entryModule.buildMeta.providedExports
-				])
-			);
+
+			if (entries[0].entryModule.buildMeta.providedExports === true) {
+				// Can also occur if doing `export * from 'common js module'`
+				throw new Error('Attempted to load a worker implemented in CommonJS');
+			}
+
+			let exports = entries[0].entryModule.buildMeta.providedExports;
 
 			// console.log('Workerized exports: ', exports.join(', '));
 

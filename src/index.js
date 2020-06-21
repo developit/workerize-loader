@@ -64,7 +64,7 @@ loader.pitch = function(request) {
 		if (err) return cb(err);
 
 		if (entries[0]) {
-			worker.file = entries[0].files[0];
+			worker.file = Array.from(entries[0].files)[0];
 
 			let contents = compilation.assets[worker.file].source();
 

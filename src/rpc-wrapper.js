@@ -1,4 +1,5 @@
-export default function addMethods(worker, methods) {
+export default function addMethods(worker, methods, options) {
+	const transferableDetector = options.transferableDetector;
 	let c = 0;
 	let callbacks = {};
 	worker.addEventListener('message', (e) => {
@@ -27,11 +28,9 @@ export default function addMethods(worker, methods) {
 		worker[method] = (...params) => new Promise( (a, b) => {
 			let id = ++c;
 			callbacks[id] = [a, b];
-			const transferables = params.filter(x => (
-				(x instanceof ArrayBuffer) ||
-				(x instanceof MessagePort) ||
-				(self.ImageBitmap && x instanceof ImageBitmap)
-			));
+			const transferables = transferableDetector ? params.reduce((m, p) =>
+				m.concat(transferableDetector(p))
+			, []) : [];
 			worker.postMessage({ type: 'RPC', id, method, params }, transferables);
 		});
 	});

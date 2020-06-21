@@ -5,6 +5,8 @@ import NodeTargetPlugin from 'webpack/lib/node/NodeTargetPlugin';
 import SingleEntryPlugin from 'webpack/lib/SingleEntryPlugin';
 import WebWorkerTemplatePlugin from 'webpack/lib/webworker/WebWorkerTemplatePlugin';
 
+import defaultTransferableDetector from './transferable-detector';
+
 export default function loader() {}
 
 const CACHE = {};
@@ -151,12 +153,25 @@ loader.pitch = function(request) {
 				workerUrl = `"data:,importScripts('"+location.origin+${workerUrl}+"')"`;
 			}
 
+			let transferableDetector = 'null';
+			if (options.transferable) {
+				const transferable = options.transferable;
+				const type = typeof transferable;
+				transferableDetector = Function.prototype.toString.call(
+					type === 'object' && typeof transferable.detector === 'function' ?
+						transferable.detector : defaultTransferableDetector
+				);
+			}
+			// TODO: Remove this line to respect options.transferable
+			transferableDetector = Function.prototype.toString.call(defaultTransferableDetector);
+
 			return cb(null, `
 				var addMethods = require(${loaderUtils.stringifyRequest(this, path.resolve(__dirname, 'rpc-wrapper.js'))})
 				var methods = ${JSON.stringify(exports)}
+				var options = {transferableDetector: ${transferableDetector}}
 				module.exports = function() {
 					var w = new Worker(${workerUrl}, { name: ${JSON.stringify(filename)} })
-					addMethods(w, methods)
+					addMethods(w, methods, options)
 					${ options.ready ? 'w.ready = new Promise(function(r) { w.addEventListener("ready", function(){ r(w) }) })' : '' }
 					return w
 				}

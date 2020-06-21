@@ -11,6 +11,7 @@ function workerSetup() {
 				p = Promise.reject('No such method');
 			}
 			p.then(result => {
+				// I don't know how to pass a custom transferableDetector to this loader...
 				const transferables = [result].filter(x => (
 					(x instanceof ArrayBuffer) ||
 					(x instanceof MessagePort) ||

@@ -7,7 +7,9 @@ export function foo() {
 }
 
 export function throwError() {
-	throw new Error('Error in worker.js');
+	const toThrow = new Error('Error in worker.js');
+	toThrow.foo = 'bar';
+	throw toThrow;
 }
 
 export const bar = (a, b) => `${a} [bar:${otherBar}] ${b}`;

@@ -105,6 +105,7 @@ All worker code can now use Promises.
 
 ### Testing
 
+## Without Webpack
 To test a module that is normally imported via `workerize-loader` when not using Webpack, import the module directly in your test:
 
 ```diff
@@ -113,24 +114,28 @@ To test a module that is normally imported via `workerize-loader` when not using
 
 const instance = worker();
 ```
+## With Webpack and Jest
+In Jest, it's possible to define a custom `transform` that emulates workerize-loader on the main thread.
 
-To test modules that rely on workerized imports when not using Webpack, you'll need to dig into your test runner a bit. For Jest, it's possible to define a custom `transform` that emulates workerize-loader on the main thread:
-
-```js
-// in your Jest configuration
-{
-  "transform": {
-    "workerize-loader(\\?.*)?!(.*)": "<rootDir>/workerize-jest.js"
-  }
-}
+Steps to follow:
+1. Install dev dependencies `npm i babel-jest identity-object-proxy -D`
+2. Add this entry to `moduleNameMapper` section in jest config located in `package.json`:
+```ts
+"workerize-loader(\\?.*)?!(.*)": "identity-obj-proxy"
 ```
-
-... then add the `workerize-jest.js` shim to your project:
-
-```js
+3. Add this entry to jest config located in `package.json`:
+```ts
+	"transform": {
+	      "workerize-loader(\\?.*)?!(.*)": "<rootDir>/workerize-jest.js",
+	      "^.+\\.[jt]sx?$": "babel-jest",
+	      "^.+\\.[jt]s?$": "babel-jest"
+	    }
+```
+4. Add jest custom transformer file `workerize-jest.js` in root dir:
+```ts
 module.exports = {
   process(src, filename, config, options) {
-    return 'module.exports = () => require(' + JSON.stringify(filename.replace(/.+!/,'')) + ')';
+    return 'module.exports = () => require(' + JSON.stringify(filename.replace(/.+!/, '')) + ')';
   },
 };
 ```

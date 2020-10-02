@@ -65,6 +65,105 @@ or
 import worker from 'workerize-loader?inline!./worker'
 ```
 
+#### `name`
+
+Type: `String`
+Default: `[hash]`
+
+You can pass filename prefix for the compiled worker. Note, that `.worker` suffix will be added automatically
+
+```js
+// webpack.config.js
+{
+  loader: 'workerize-loader',
+  options: { name: '[name].[contenthash:8]' }
+}
+```
+or 
+```js
+import worker from 'workerize-loader?{"name":"[name].[contenthash:8]"}!./worker'
+```
+
+#### `publicPath`
+
+Type: `String`
+Default: based on `output.publicPath`
+
+You can pass `publicPath` to specify the public URL address of the output files
+
+```js
+// webpack.config.js
+{
+  loader: 'workerize-loader',
+  options: { publicPath: '/static/' }
+}
+```
+or 
+```js
+import worker from 'workerize-loader?{"publicPath":"/static/"}!./worker'
+```
+
+#### `ready`
+
+Type: `Boolean`
+Default: `false`
+
+You can pass `ready` to set up a wrapper around the `"ready"` event
+
+```js
+// webpack.config.js
+{
+  loader: 'workerize-loader',
+  options: { ready: true }
+}
+```
+or 
+```js
+import worker from 'workerize-loader?ready!./worker'
+
+let instance = worker()  // `new` is optional
+
+await instance.ready
+```
+
+#### `fallback`
+
+Type: `Boolean`
+Default: `true`
+
+// TODO: document fallback option
+
+```js
+// webpack.config.js
+{
+  loader: 'workerize-loader',
+  options: { fallback: false }
+}
+```
+or 
+```js
+import worker from 'workerize-loader?fallback=false!./worker'
+```
+
+#### `import`
+
+Type: `Boolean`
+Default: `false`
+
+// TODO: document import option
+
+```js
+// webpack.config.js
+{
+  loader: 'workerize-loader',
+  options: { import: true }
+}
+```
+or 
+```js
+import worker from 'workerize-loader?import!./worker'
+```
+
 ### About [Babel](https://babeljs.io/)
 
 If you're using [Babel](https://babeljs.io/) in your build, make sure you disabled commonJS transform. Otherwize, workerize-loader won't be able to retrieve the list of exported function from your worker script :

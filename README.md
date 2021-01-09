@@ -114,33 +114,53 @@ To test a module that is normally imported via `workerize-loader` when not using
 
 const instance = worker();
 ```
+
 ## With Webpack and Jest
+
 In Jest, it's possible to define a custom `transform` that emulates workerize-loader on the main thread.
 
-Steps to follow:
-1. Install dev dependencies `npm i babel-jest identity-object-proxy -D`
-2. Add this entry to `moduleNameMapper` section in jest config located in `package.json`:
-```ts
-"workerize-loader(\\?.*)?!(.*)": "identity-obj-proxy"
+First, install `babel-jest` and `identity-object-proxy`:
+
+```sh
+npm i -D babel-jest identity-object-proxy
 ```
-3. Add this entry to jest config located in `package.json`:
-```ts
-	"transform": {
-	      "workerize-loader(\\?.*)?!(.*)": "<rootDir>/workerize-jest.js",
-	      "^.+\\.[jt]sx?$": "babel-jest",
-	      "^.+\\.[jt]s?$": "babel-jest"
-	    }
+
+Then, add these properties to the `"transform"` and `"moduleNameMapper"` sections of your Jest config (generally located in your `package.json`):
+
+```js
+{
+  "jest": {
+    "moduleNameMapper": {
+      "workerize-loader(\\?.*)?!(.*)": "identity-obj-proxy"
+    },
+    "transform": {
+      "workerize-loader(\\?.*)?!(.*)": "<rootDir>/workerize-jest.js",
+      "^.+\\.[jt]sx?$": "babel-jest",
+      "^.+\\.[jt]s?$": "babel-jest"
+    }
+  }
+}
 ```
-4. Add jest custom transformer file `workerize-jest.js` in root dir:
-```ts
+
+Finally, create the custom Jest transformer referenced above as a file `workerize-jest.js` in your project's root directory (where the package.json is):
+
+```js
 module.exports = {
-  process(src, filename, config, options) {
-    return 'module.exports = () => require(' + JSON.stringify(filename.replace(/.+!/, '')) + ')';
-  },
+  process(src, filename) {
+    return `
+      async function asyncify() { return this.apply(null, arguments); }
+      module.exports = function() {
+        const w = require(${JSON.stringify(filename.replace(/^.+!/, ''))});
+	const m = {};
+	for (let i in w) m[i] = asyncify.bind(w[i]);
+	return m;
+      };
+    `;
+  }
 };
 ```
 
-Now your tests and any modules they import can use `workerize-loader!` prefixes.
+Now your tests and any modules they import can use `workerize-loader!` prefixes, and the imports will be turned into async functions just like they are in Workerize.
 
 ### Credit
 

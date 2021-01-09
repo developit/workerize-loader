@@ -70,7 +70,7 @@ import worker from 'workerize-loader?inline!./worker'
 Type: `String`
 Default: `[hash]`
 
-You can pass filename prefix for the compiled worker. Note, that `.worker` suffix will be added automatically
+Customize filename generation for worker bundles. Note that a `.worker` suffix will be injected automatically (`{name}.worker.js`).
 
 ```js
 // webpack.config.js
@@ -89,7 +89,7 @@ import worker from 'workerize-loader?{"name":"[name].[contenthash:8]"}!./worker'
 Type: `String`
 Default: based on `output.publicPath`
 
-You can pass `publicPath` to specify the public URL address of the output files
+Workerize uses the configured value of `output.publicPath` from Webpack unless specified here. The value of `publicPath` gets prepended to bundle filenames to get their full URL. It can be a path, or a full URL with host.
 
 ```js
 // webpack.config.js
@@ -108,7 +108,7 @@ import worker from 'workerize-loader?{"publicPath":"/static/"}!./worker'
 Type: `Boolean`
 Default: `false`
 
-You can pass `ready` to set up a wrapper around the `"ready"` event
+If `true`, the imported "workerized" module will include a `ready` property, which is a Promise that resolves once the Worker has been loaded. Note: this is unnecessary in most cases, since worker methods can be called prior to the worker being loaded.
 
 ```js
 // webpack.config.js
@@ -126,31 +126,12 @@ let instance = worker()  // `new` is optional
 await instance.ready
 ```
 
-#### `fallback`
-
-Type: `Boolean`
-Default: `true`
-
-// TODO: document fallback option
-
-```js
-// webpack.config.js
-{
-  loader: 'workerize-loader',
-  options: { fallback: false }
-}
-```
-or 
-```js
-import worker from 'workerize-loader?fallback=false!./worker'
-```
-
 #### `import`
 
 Type: `Boolean`
 Default: `false`
 
-// TODO: document import option
+When enabled, generated output will create your Workers using a Data URL that loads your code via `importScripts` (eg: `new Worker('data:,importScripts("url")')`). This workaround enables cross-origin script preloading, but Workers are created on an "opaque origin" and cannot access resources on the origin of their host page without CORS enabled. Only enable it if you understand this and specifically need the workaround.
 
 ```js
 // webpack.config.js

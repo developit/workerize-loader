@@ -46,6 +46,8 @@ instance.expensive(1000).then( count => {
 
 ### Options
 
+Workerize options can either be defined in your Webpack configuration, or using Webpack's [syntax for inline loader options](https://webpack.js.org/concepts/loaders/#inline).
+
 #### `inline`
 
 Type: `Boolean`
@@ -60,9 +62,92 @@ You can also inline the worker as a BLOB with the `inline` parameter
   options: { inline: true }
 }
 ```
-or 
+
+or
+
 ```js
 import worker from 'workerize-loader?inline!./worker'
+```
+
+#### `name`
+
+Type: `String`
+Default: `[hash]`
+
+Customize filename generation for worker bundles. Note that a `.worker` suffix will be injected automatically (`{name}.worker.js`).
+
+```js
+// webpack.config.js
+{
+  loader: 'workerize-loader',
+  options: { name: '[name].[contenthash:8]' }
+}
+```
+
+or
+
+```js
+import worker from 'workerize-loader?name=[name].[contenthash:8]!./worker'
+```
+
+#### `publicPath`
+
+Type: `String`
+Default: based on `output.publicPath`
+
+Workerize uses the configured value of `output.publicPath` from Webpack unless specified here. The value of `publicPath` gets prepended to bundle filenames to get their full URL. It can be a path, or a full URL with host.
+
+```js
+// webpack.config.js
+{
+  loader: 'workerize-loader',
+  options: { publicPath: '/static/' }
+}
+```
+
+#### `ready`
+
+Type: `Boolean`
+Default: `false`
+
+If `true`, the imported "workerized" module will include a `ready` property, which is a Promise that resolves once the Worker has been loaded. Note: this is unnecessary in most cases, since worker methods can be called prior to the worker being loaded.
+
+```js
+// webpack.config.js
+{
+  loader: 'workerize-loader',
+  options: { ready: true }
+}
+```
+
+or
+
+```js
+import worker from 'workerize-loader?ready!./worker'
+
+let instance = worker()  // `new` is optional
+await instance.ready
+```
+
+#### `import`
+
+Type: `Boolean`
+Default: `false`
+
+When enabled, generated output will create your Workers using a Data URL that loads your code via `importScripts` (eg: `new Worker('data:,importScripts("url")')`). This workaround enables cross-origin script preloading, but Workers are created on an "opaque origin" and cannot access resources on the origin of their host page without CORS enabled. Only enable it if you understand this and specifically need the workaround.
+
+```js
+// webpack.config.js
+{
+  loader: 'workerize-loader',
+  options: { import: true }
+}
+```
+
+or 
+
+```js
+import worker from 'workerize-loader?import!./worker'
 ```
 
 ### About [Babel](https://babeljs.io/)

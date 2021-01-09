@@ -46,6 +46,8 @@ instance.expensive(1000).then( count => {
 
 ### Options
 
+Workerize options can either be defined in your Webpack configuration, or using Webpack's [syntax for inline loader options](https://webpack.js.org/concepts/loaders/#inline).
+
 #### `inline`
 
 Type: `Boolean`
@@ -60,7 +62,9 @@ You can also inline the worker as a BLOB with the `inline` parameter
   options: { inline: true }
 }
 ```
-or 
+
+or
+
 ```js
 import worker from 'workerize-loader?inline!./worker'
 ```
@@ -79,9 +83,11 @@ Customize filename generation for worker bundles. Note that a `.worker` suffix w
   options: { name: '[name].[contenthash:8]' }
 }
 ```
-or 
+
+or
+
 ```js
-import worker from 'workerize-loader?{"name":"[name].[contenthash:8]"}!./worker'
+import worker from 'workerize-loader?name=[name].[contenthash:8]!./worker'
 ```
 
 #### `publicPath`
@@ -98,10 +104,6 @@ Workerize uses the configured value of `output.publicPath` from Webpack unless s
   options: { publicPath: '/static/' }
 }
 ```
-or 
-```js
-import worker from 'workerize-loader?{"publicPath":"/static/"}!./worker'
-```
 
 #### `ready`
 
@@ -117,12 +119,13 @@ If `true`, the imported "workerized" module will include a `ready` property, whi
   options: { ready: true }
 }
 ```
-or 
+
+or
+
 ```js
 import worker from 'workerize-loader?ready!./worker'
 
 let instance = worker()  // `new` is optional
-
 await instance.ready
 ```
 
@@ -140,7 +143,9 @@ When enabled, generated output will create your Workers using a Data URL that lo
   options: { import: true }
 }
 ```
+
 or 
+
 ```js
 import worker from 'workerize-loader?import!./worker'
 ```

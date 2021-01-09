@@ -190,6 +190,7 @@ All worker code can now use Promises.
 
 ### Testing
 
+## Without Webpack
 To test a module that is normally imported via `workerize-loader` when not using Webpack, import the module directly in your test:
 
 ```diff
@@ -199,28 +200,52 @@ To test a module that is normally imported via `workerize-loader` when not using
 const instance = worker();
 ```
 
-To test modules that rely on workerized imports when not using Webpack, you'll need to dig into your test runner a bit. For Jest, it's possible to define a custom `transform` that emulates workerize-loader on the main thread:
+## With Webpack and Jest
+
+In Jest, it's possible to define a custom `transform` that emulates workerize-loader on the main thread.
+
+First, install `babel-jest` and `identity-object-proxy`:
+
+```sh
+npm i -D babel-jest identity-object-proxy
+```
+
+Then, add these properties to the `"transform"` and `"moduleNameMapper"` sections of your Jest config (generally located in your `package.json`):
 
 ```js
-// in your Jest configuration
 {
-  "transform": {
-    "workerize-loader(\\?.*)?!(.*)": "<rootDir>/workerize-jest.js"
+  "jest": {
+    "moduleNameMapper": {
+      "workerize-loader(\\?.*)?!(.*)": "identity-obj-proxy"
+    },
+    "transform": {
+      "workerize-loader(\\?.*)?!(.*)": "<rootDir>/workerize-jest.js",
+      "^.+\\.[jt]sx?$": "babel-jest",
+      "^.+\\.[jt]s?$": "babel-jest"
+    }
   }
 }
 ```
 
-... then add the `workerize-jest.js` shim to your project:
+Finally, create the custom Jest transformer referenced above as a file `workerize-jest.js` in your project's root directory (where the package.json is):
 
 ```js
 module.exports = {
-  process(src, filename, config, options) {
-    return 'module.exports = () => require(' + JSON.stringify(filename.replace(/.+!/,'')) + ')';
-  },
+  process(src, filename) {
+    return `
+      async function asyncify() { return this.apply(null, arguments); }
+      module.exports = function() {
+        const w = require(${JSON.stringify(filename.replace(/^.+!/, ''))});
+        const m = {};
+        for (let i in w) m[i] = asyncify.bind(w[i]);
+        return m;
+      };
+    `;
+  }
 };
 ```
 
-Now your tests and any modules they import can use `workerize-loader!` prefixes.
+Now your tests and any modules they import can use `workerize-loader!` prefixes, and the imports will be turned into async functions just like they are in Workerize.
 
 ### Credit
 

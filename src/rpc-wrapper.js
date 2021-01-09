@@ -2,7 +2,7 @@ export default function addMethods(worker, methods) {
 	let c = 0;
 	let callbacks = {};
 	worker.addEventListener('message', (e) => {
-		let d = e.data;
+		let d = e.data, evt;
 		if (d.type!=='RPC') return;
 		if (d.id) {
 			let f = callbacks[d.id];
@@ -17,8 +17,12 @@ export default function addMethods(worker, methods) {
 			}
 		}
 		else {
-			let evt = document.createEvent('Event');
-			evt.initEvent(d.method, false, false);
+			try {
+				evt = new Event(d.method);
+			} catch (e) {
+				evt = document.createEvent('Event');
+				evt.initEvent(d.method, false, false);
+			}
 			evt.data = d.params;
 			worker.dispatchEvent(evt);
 		}

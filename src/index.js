@@ -128,7 +128,12 @@ loader.pitch = function(request) {
 
 			let key = entries[0].entryModule.nameForCondition();
 			let contents = compilation.assets[worker.file].source();
-			let exports = Object.keys(CACHE[key] || {});
+			let exports = Array.from(
+				new Set([
+					...Object.keys(CACHE[key] || {}),
+					...entries[0].entryModule.buildMeta.providedExports
+				])
+			);
 
 			// console.log('Workerized exports: ', exports.join(', '));
 

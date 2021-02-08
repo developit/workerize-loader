@@ -38,7 +38,7 @@ loader.pitch = function(request) {
 
 	const cb = this.async();
 
-	const filename = loaderUtils.interpolateName(this, `${options.name || '[hash]'}.worker.js`, {
+	const filename = loaderUtils.interpolateName(this, `${options.name || '[fullhash]'}.worker.js`, {
 		context: options.context || this.rootContext || this.options.context,
 		regExp: options.regExp
 	});
@@ -89,22 +89,37 @@ loader.pitch = function(request) {
 
 	compilationHook(worker.compiler, (compilation, data) => {
 		if (compilation.cache) {
-			if (!compilation.cache[subCache]) compilation.cache[subCache] = {};
-
-			compilation.cache = compilation.cache[subCache];
+			let cache;
+			if (compilation.cache instanceof Map) {
+				cache = compilation.cache.get(subCache);
+				if (!cache) {
+					cache = new Map();
+					compilation.cache.set(subCache, cache);
+				}
+			}
+			else if (!compilation.cache[subCache]) {
+				cache = compilation.cache[subCache] = {};
+			}
+			
+			compilation.cache = cache;
 		}
 		parseHook(data, (parser, options) => {
 			exportDeclarationHook(parser, expr => {
-				let decl = expr.declaration || expr,
-					{ compilation, current } = parser.state,
-					entry = compilation.entries[0].resource;
+				let decl = expr.declaration || expr;
+				let	{ compilation, current } = parser.state;
+
+				let entryModule =
+					compilation.entries instanceof Map
+						? compilation.moduleGraph.getModule(
+							compilation.entries.get('main').dependencies[0]
+						  )
+						: compilation.entries[0];
 
 				// only process entry exports
-				if (current.resource!==entry) return;
+				if (current.resource!==entryModule.resource) return;
 
 				let key = current.nameForCondition();
 				let exports = CACHE[key] || (CACHE[key] = {});
-
 				if (decl.id) {
 					exports[decl.id.name] = true;
 				}
@@ -116,6 +131,20 @@ loader.pitch = function(request) {
 				else {
 					console.warn('[workerize] unknown export declaration: ', expr);
 				}
+
+				// This is for Webpack 5: mark the exports as used so it does not get tree-shaken away on production build
+				if (compilation.moduleGraph) {
+					const { getEntryRuntime } = require('webpack/lib/util/runtime');
+					const { UsageState } = require('webpack');
+					const runtime = getEntryRuntime(compilation, 'main');
+					for (const exportName of Object.keys(exports)) {
+						const exportInfo = compilation.moduleGraph.getExportInfo(entryModule, exportName);
+						exportInfo.setUsed(UsageState.Used, runtime);
+						exportInfo.canMangleUse = false;
+						exportInfo.canMangleProvide = false;
+					}
+					compilation.moduleGraph.addExtraReason(entryModule, 'used by workerize-loader');
+				}
 			});
 		});
 	});
@@ -124,9 +153,20 @@ loader.pitch = function(request) {
 		if (err) return cb(err);
 
 		if (entries[0]) {
-			worker.file = entries[0].files[0];
+			worker.file = Array.from(entries[0].files)[0];
+			const entryModules =
+				compilation.chunkGraph &&
+				compilation.chunkGraph.getChunkEntryModulesIterable
+					? Array.from(
+						compilation.chunkGraph.getChunkEntryModulesIterable(entries[0])
+					  )
+					: null;
+			const entryModule =
+				entryModules && entryModules.length > 0
+					? entryModules[0]
+					: entries[0].entryModule;
 
-			let key = entries[0].entryModule.nameForCondition();
+			let key = entryModule.nameForCondition();
 			let contents = compilation.assets[worker.file].source();
 			let exports = Object.keys(CACHE[key] || {});
 

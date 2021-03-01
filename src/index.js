@@ -7,7 +7,6 @@ import WebWorkerTemplatePlugin from 'webpack/lib/webworker/WebWorkerTemplatePlug
 
 export default function loader() {}
 
-const CACHE = {};
 const tapName = 'workerize-loader';
 
 function compilationHook(compiler, handler) {
@@ -86,23 +85,9 @@ loader.pitch = function(request) {
 	(new SingleEntryPlugin(this.context, `!!${path.resolve(__dirname, 'rpc-worker-loader.js')}!${request}`, 'main')).apply(worker.compiler);
 
 	const subCache = `subcache ${__dirname} ${request}`;
+	const CACHE = this._compilation.getCache(subCache);
 
 	compilationHook(worker.compiler, (compilation, data) => {
-		if (compilation.cache) {
-			let cache;
-			if (compilation.cache instanceof Map) {
-				cache = compilation.cache.get(subCache);
-				if (!cache) {
-					cache = new Map();
-					compilation.cache.set(subCache, cache);
-				}
-			}
-			else if (!compilation.cache[subCache]) {
-				cache = compilation.cache[subCache] = {};
-			}
-			
-			compilation.cache = cache;
-		}
 		parseHook(data, (parser, options) => {
 			exportDeclarationHook(parser, expr => {
 				let decl = expr.declaration || expr;

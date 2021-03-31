@@ -176,11 +176,15 @@ loader.pitch = function(request) {
 				workerUrl = `"data:,importScripts('"+location.origin+${workerUrl}+"')"`;
 			}
 
+			// workerUrl will be URL.revokeObjectURL() to avoid memory leaks on browsers
+			// https://github.com/webpack-contrib/worker-loader/issues/208
+
 			return cb(null, `
 				var addMethods = require(${loaderUtils.stringifyRequest(this, path.resolve(__dirname, 'rpc-wrapper.js'))})
 				var methods = ${JSON.stringify(exports)}
 				module.exports = function() {
 					var w = new Worker(${workerUrl}, { name: ${JSON.stringify(filename)} })
+					URL.revokeObjectURL(${workerUrl});
 					addMethods(w, methods)
 					${ options.ready ? 'w.ready = new Promise(function(r) { w.addEventListener("ready", function(){ r(w) }) })' : '' }
 					return w

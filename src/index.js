@@ -7,6 +7,7 @@ import WebWorkerTemplatePlugin from 'webpack/lib/webworker/WebWorkerTemplatePlug
 
 export default function loader() {}
 
+const CACHE = {};
 const tapName = 'workerize-loader';
 
 function compilationHook(compiler, handler) {
@@ -37,25 +38,24 @@ loader.pitch = function(request) {
 
 	const cb = this.async();
 
-	const filename = loaderUtils.interpolateName(this, `${options.name || '[fullhash]'}.worker.js`, {
-		context: options.context || this.rootContext || this.options.context,
-		regExp: options.regExp
-	});
+	const compilerOptions = this._compiler.options || {};
+
+	const filename = (options.name || '[fullhash]') + '.worker.js';
 
 	const worker = {};
 
 	worker.options = {
 		filename,
-		chunkFilename: `[id].${filename}`,
-		namedChunkFilename: null
+		chunkFilename: filename,
+		publicPath: options.publicPath || compilerOptions.output.publicPath,
+		globalObject: 'self'
 	};
 
-	const compilerOptions = this._compiler.options || {};
 	if (compilerOptions.output && compilerOptions.output.globalObject==='window') {
 		console.warn('Warning (workerize-loader): output.globalObject is set to "window". It should be set to "self" or "this" to support HMR in Workers.');
 	}
 
-	worker.compiler = this._compilation.createChildCompiler('worker', worker.options);
+	worker.compiler = this._compilation.createChildCompiler(`worker ${request}`, worker.options);
 
 	(new WebWorkerTemplatePlugin(worker.options)).apply(worker.compiler);
 
@@ -82,10 +82,9 @@ loader.pitch = function(request) {
 		}).apply(worker.compiler);
 	}
 
-	(new SingleEntryPlugin(this.context, `!!${path.resolve(__dirname, 'rpc-worker-loader.js')}!${request}`, 'main')).apply(worker.compiler);
+	const bundleName = path.parse(this.resourcePath).name;
 
-	const subCache = `subcache ${__dirname} ${request}`;
-	const CACHE = this._compilation.getCache(subCache);
+	(new SingleEntryPlugin(this.context, `!!${path.resolve(__dirname, 'rpc-worker-loader.js')}!${request}`, bundleName)).apply(worker.compiler);
 
 	compilationHook(worker.compiler, (compilation, data) => {
 		parseHook(data, (parser, options) => {
@@ -96,7 +95,7 @@ loader.pitch = function(request) {
 				let entryModule =
 					compilation.entries instanceof Map
 						? compilation.moduleGraph.getModule(
-							compilation.entries.get('main').dependencies[0]
+							compilation.entries.get(bundleName).dependencies[0]
 						  )
 						: compilation.entries[0];
 
@@ -121,7 +120,7 @@ loader.pitch = function(request) {
 				if (compilation.moduleGraph) {
 					const { getEntryRuntime } = require('webpack/lib/util/runtime');
 					const { UsageState } = require('webpack');
-					const runtime = getEntryRuntime(compilation, 'main');
+					const runtime = getEntryRuntime(compilation, bundleName);
 					for (const exportName of Object.keys(exports)) {
 						const exportInfo = compilation.moduleGraph.getExportInfo(entryModule, exportName);
 						exportInfo.setUsed(UsageState.Used, runtime);

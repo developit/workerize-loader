@@ -41,7 +41,7 @@
     "eslint-config-developit": "^1.2.0",
     "karmatic": "^1.4.0",
     "microbundle": "^0.12.1",
-    "webpack": "^4.43.0"
+    "webpack": "^5.30.0"
   },
   "dependencies": {
     "loader-utils": "^2.0.0"

@@ -3,6 +3,7 @@ export default function addMethods(worker, methods) {
 	let callbacks = {};
 	worker.addEventListener('message', (e) => {
 		let d = e.data;
+		if(!d) return;
 		if (d.type!=='RPC') return;
 		if (d.id) {
 			let f = callbacks[d.id];

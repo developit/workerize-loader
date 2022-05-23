@@ -42,6 +42,7 @@
     "eslint-config-developit": "^1.2.0",
     "karmatic": "^3.0.0",
     "microbundle": "^0.12.1",
+    "puppeteer": "^14.1.1",
     "webpack": "^5.30.0"
   },
   "dependencies": {

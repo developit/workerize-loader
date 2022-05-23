@@ -5,11 +5,10 @@
   "main": "dist/index.js",
   "repository": "developit/workerize-loader",
   "scripts": {
-    "postinstall": "patch-package",
     "build": "microbundle --format cjs --no-compress --inline none src/*.js",
     "prepublishOnly": "npm run build",
-    "dev": "karmatic watch --no-headless",
-    "test": "npm run build && karmatic && NODE_ENV=production karmatic -p",
+    "dev": "patch-package && karmatic watch --no-headless",
+    "test": "patch-package && npm run build && karmatic && NODE_ENV=production karmatic -p",
     "release": "npm t && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
   "browserslist": [

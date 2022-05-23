@@ -172,7 +172,7 @@ loader.pitch = function(request) {
 
 			let workerUrl = worker.url;
 			if (options.import) {
-				workerUrl = `"data:,importScripts('"+location.origin+${workerUrl}+"')"`;
+				workerUrl = `"data:,importScripts('"+new URL(${workerUrl},location.origin)+"')"`;
 			}
 
 			// workerUrl will be URL.revokeObjectURL() to avoid memory leaks on browsers

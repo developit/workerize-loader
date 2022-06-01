@@ -16,6 +16,9 @@ function workerSetup() {
 				.catch(e => {
 					let error = { message: e };
 					if (e.stack) {
+						error = Object.assign({}, e);
+
+						/* Include potentially nonenumerable values */
 						error.message = e.message;
 						error.stack = e.stack;
 						error.name = e.name;

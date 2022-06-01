@@ -26,6 +26,7 @@ describe('worker', () => {
 		}
 		catch (e) {
 			expect(e).toEqual(Error('Error in worker.js'));
+			expect(e.foo).toEqual('bar');
 		}
 	});
 

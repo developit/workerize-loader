@@ -1,0 +1,19 @@
+diff --git a/node_modules/karma-webpack/lib/karma-webpack/framework.js b/node_modules/karma-webpack/lib/karma-webpack/framework.js
+index b44e979..1f822a2 100644
+--- a/node_modules/karma-webpack/lib/karma-webpack/framework.js
++++ b/node_modules/karma-webpack/lib/karma-webpack/framework.js
+@@ -16,7 +16,13 @@ function KW_Framework(config) {
+   fs.closeSync(fs.openSync(commonsPath, 'w'));
+   fs.closeSync(fs.openSync(runtimePath, 'w'));
+ 
+-  // register for karma
++  config.files.unshift({
++    pattern: controller.outputPath + '/**',
++    included: false,
++    watched: true,
++  });
++
++	// register for karma
+   config.files.unshift({
+     pattern: commonsPath,
+     included: true,

@@ -1,14 +1,14 @@
 {
   "name": "workerize-loader",
-  "version": "1.3.0",
+  "version": "2.0.2",
   "description": "Automatically move a module into a Web Worker (Webpack loader)",
   "main": "dist/index.js",
   "repository": "developit/workerize-loader",
   "scripts": {
     "build": "microbundle --format cjs --no-compress --inline none src/*.js",
     "prepublishOnly": "npm run build",
-    "dev": "karmatic watch --no-headless",
-    "test": "npm run build && karmatic && NODE_ENV=production karmatic -p",
+    "dev": "patch-package && karmatic watch --no-headless",
+    "test": "patch-package && npm run build && karmatic && NODE_ENV=production karmatic -p",
     "release": "npm t && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
   "browserslist": [
@@ -37,11 +37,14 @@
   "author": "Jason Miller <jason@developit.ca> (http://jasonformat.com)",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^27.5.1",
     "eslint": "^7.2.0",
     "eslint-config-developit": "^1.2.0",
-    "karmatic": "^1.4.0",
+    "karmatic": "^3.0.0",
     "microbundle": "^0.12.1",
-    "webpack": "^4.43.0"
+    "patch-package": "^6.4.7",
+    "puppeteer": "^14.1.1",
+    "webpack": "^5.30.0"
   },
   "dependencies": {
     "loader-utils": "^2.0.0"

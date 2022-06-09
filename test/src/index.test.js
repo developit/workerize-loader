@@ -8,11 +8,31 @@ describe('worker', () => {
 
 	it('should be an instance of Worker', () => {
 		worker = new Worker();
+		// eslint-disable-next-line jest/no-jasmine-globals
 		expect(worker).toEqual(jasmine.any(window.Worker));
 	});
 
 	it('worker.foo()', async () => {
 		expect(await worker.foo()).toBe(1);
+	});
+
+	it('worker.otherFoo()', async () => {
+		expect(await worker.otherFoo()).toBe(-1);
+	});
+
+	it('worker.otherOtherFoo()', async () => {
+		expect(await worker.otherOtherFoo()).toBe(2);
+	});
+	it('worker.andTheOtherFoo()', async () => {
+		expect(await worker.andTheOtherFoo()).toBe(2);
+	});
+
+	it('worker.anyFoo()', async () => {
+		expect(await worker.anyFoo()).toBe(4);
+	});
+
+	it('worker.tragedy()', async () => {
+		expect(await worker.tragedy()).toBe('common');
 	});
 
 	it('worker.bar()', async () => {
@@ -102,6 +122,7 @@ describe('?import option', () => {
 
 	it('should be an instance of Worker', () => {
 		worker = new ImportWorker();
+		// eslint-disable-next-line jest/no-jasmine-globals
 		expect(worker).toEqual(jasmine.any(window.Worker));
 	});
 
